@@ -32,6 +32,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 
 public class PayPalMPL extends CordovaPlugin implements OnClickListener {
@@ -205,7 +206,7 @@ public class PayPalMPL extends CordovaPlugin implements OnClickListener {
 		pp.setDynamicAmountCalculationEnabled(false);
 		
 		if( this.ppButton != null ) {
-			webView.removeView( this.ppButton );
+			((ViewGroup) webView.getView().getParent()).removeView( this.ppButton );
 			this.ppButton = null;
 		}
 		
@@ -217,7 +218,7 @@ public class PayPalMPL extends CordovaPlugin implements OnClickListener {
 		// You'll need to have an OnClickListener for the CheckoutButton.
 		this.ppButton.setOnClickListener(this);
 		this.ppButton.setId(PAYPAL_BUTTON_ID);		
-		webView.addView( this.ppButton );
+		((ViewGroup) webView.getView().getParent()).addView( this.ppButton );
 		this.ppButton.setVisibility( bHideButton ? View.INVISIBLE : View.VISIBLE );		
 
 		callbackContext.sendPluginResult( new PluginResult(Status.OK) );
@@ -240,7 +241,7 @@ public class PayPalMPL extends CordovaPlugin implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		if (v == (CheckoutButton) webView.findViewById(PAYPAL_BUTTON_ID)) {
+		if (v == (CheckoutButton) ((ViewGroup) webView.getView().getParent()).findViewById(PAYPAL_BUTTON_ID)) {
 			Log.d(LOGTAG, "paypal button clicked.");
 			
 			checkout();
