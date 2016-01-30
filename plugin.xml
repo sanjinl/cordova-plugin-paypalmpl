@@ -23,7 +23,7 @@
 
     <!-- android -->
     <platform name="android">
-<dependency id="com.paypal.mpl-android" version=">=1.5.5"/>
+        <!-- <dependency id="com.paypal.mpl-android" version=">=1.5.5"/> -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="PayPalMPL">
                 <param name="android-package" value="com.rjfun.cordova.plugin.PayPalMPL"/>
@@ -36,7 +36,7 @@
      
      <!-- ios -->
      <platform name="ios">    
-<dependency id="com.paypal.mpl-ios" version=">=2.0.1"/>
+         <!-- <dependency id="com.paypal.mpl-ios" version=">=2.0.1"/> -->
          <config-file target="config.xml" parent="/*">
              <feature name="PayPalMPL">
                  <param name="ios-package" value="CDVPayPalMPL" />
