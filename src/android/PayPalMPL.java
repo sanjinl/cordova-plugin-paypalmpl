@@ -9,9 +9,11 @@ package com.rjfun.cordova.plugin;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PermissionHelper;
 import org.apache.cordova.PluginResult;
 import org.apache.cordova.PluginResult.Status;
 import org.json.JSONArray;
@@ -28,8 +30,11 @@ import com.paypal.android.MEP.PayPalPayment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.Manifest;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,46 +61,126 @@ public class PayPalMPL extends CordovaPlugin implements OnClickListener {
 	private static final String ACTION_SET_PAYMENT_INFO = "setPaymentInfo";
 	private static final String ACTION_PAY = "pay";
 	
+	private static final int ACTION_INIT_WITH_APP_ID_CODE = 0;
+	private static final int ACTION_GET_STATUS_CODE = 1;
+	private static final int ACTION_SET_PAYMENT_INFO_CODE = 2;
+	private static final int ACTION_PAY_CODE = 3;
+		
 	private static final int REQUEST_PAYPAL_CHECKOUT = 2;
 	private static final int PAYPAL_BUTTON_ID = 10001;
 	
+	public static final int PERMISSION_DENIED_ERROR = 20;
+
+    protected final static String[] permissions = { Manifest.permission.INTERNET, Manifest.permission.READ_PHONE_STATE };
+	
 	private CallbackContext payCallback = null;
+	private CallbackContext callbackContext = null;
+	
+	private JSONArray executeArgs = null;
 	
 	@Override
 	public boolean execute(String action, final JSONArray inputs, final CallbackContext callbackContext) throws JSONException {
 		Log.d(LOGTAG, "Plugin Called: " + action);
 		
+		this.executeArgs = inputs;
+		this.callbackContext = callbackContext;
+		
 		if (ACTION_INIT_WITH_APP_ID.equals(action)) {
 			thisPlugin = this;
-			
-			cordova.getThreadPool().execute(new Runnable() {
-	            public void run() {
-	            	executeInitWithAppID(inputs, callbackContext);
-	            }
-	        });
+			requestMissingPermissions(ACTION_INIT_WITH_APP_ID_CODE, permissions);
 			return true;
 			
 		} else if (ACTION_GET_STATUS.equals(action)) {
-			executeGetStatus(inputs, callbackContext);
-			
+			requestMissingPermissions(ACTION_GET_STATUS_CODE, permissions);
+			return true;			
 		} else if (ACTION_SET_PAYMENT_INFO.equals(action)) {
-			cordova.getActivity().runOnUiThread(new Runnable() {
-	            public void run() {
-	            	executeSetPaymentInfo(inputs, callbackContext);
-	            }
-			});
+			requestMissingPermissions(ACTION_SET_PAYMENT_INFO_CODE, permissions);
 			return true;
 		} else if (ACTION_PAY.equals(action)) {
-			cordova.getActivity().runOnUiThread(new Runnable() {
-	            public void run() {
-	    			executePay(inputs, callbackContext );
-	            }
-	        });
-			return true;
-			
+			requestMissingPermissions(ACTION_PAY_CODE, permissions);
+			return true;		
 		}
 
 		return false;
+	}
+	
+    /**
+     * Executes Cordova request after ensuring required permissions have been granted.
+     * 
+     * @param requestCode Identifier of the request to execute.
+     */
+	private void safeExecute(int requestCode) {
+		final CallbackContext callbackContext = this.callbackContext;
+		final JSONArray executeArgs = this.executeArgs;
+		
+		switch(requestCode)
+		{
+			case ACTION_INIT_WITH_APP_ID_CODE:
+				cordova.getThreadPool().execute(new Runnable() {
+					public void run() {
+						executeInitWithAppID(executeArgs, callbackContext);
+					}
+				});
+				break;
+			case ACTION_GET_STATUS_CODE:
+				executeGetStatus(executeArgs, callbackContext);
+				break;
+			case ACTION_SET_PAYMENT_INFO_CODE:
+				cordova.getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						executeSetPaymentInfo(executeArgs, callbackContext);
+					}
+				});
+				break;
+			case ACTION_PAY_CODE:
+				Log.d(LOGTAG, "executePay");
+				cordova.getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						executePay(executeArgs, callbackContext);
+					}
+				});
+				break;
+		}
+	}
+	
+    /**
+     * Ensures that a given set of permissions is granted before executing the request.
+     * 
+     * @param requestCode Identifier of the request to execute.
+	 * @param permissions Permission names to request.
+     */
+	private void requestMissingPermissions(int requestCode, String[] permissions) {		
+		ArrayList<String> missingPermissions = new ArrayList(permissions.length);
+		//Builds the list of missing permissions
+		for(String permission:permissions)
+		{
+			if (!PermissionHelper.hasPermission(this, permission)) {
+				missingPermissions.add(permission);
+			}
+		}
+		
+		// Requests permissions if needed, otherwise execute request
+		if (missingPermissions.isEmpty()) {
+			safeExecute(requestCode);			
+		} else {
+			PermissionHelper.requestPermissions(this, requestCode, missingPermissions.toArray(new String[0]));
+		}
+	}
+
+    public void onRequestPermissionResult(int requestCode, String[] permissions,
+                                          int[] grantResults) throws JSONException
+    {
+        for(int r:grantResults)
+        {
+            if(r == PackageManager.PERMISSION_DENIED)
+            {
+                this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, PERMISSION_DENIED_ERROR));
+                return;
+            }
+        }
+		
+		//Execute request with permissions granted
+		safeExecute(requestCode);
 	}
 
 	private boolean executeInitWithAppID(JSONArray inputs, CallbackContext callbackContext) {
@@ -319,5 +404,9 @@ public class PayPalMPL extends CordovaPlugin implements OnClickListener {
 		});
 		
 		this.payCallback.sendPluginResult(new PluginResult(Status.ERROR, paymentStatus));
+	}
+	
+	public void onRestoreStateForActivityResult(Bundle state, CallbackContext callbackContext) {
+		this.callbackContext = callbackContext;
 	}
 }
