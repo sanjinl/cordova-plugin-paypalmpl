@@ -29,7 +29,7 @@
                 <param name="android-package" value="com.rjfun.cordova.plugin.PayPalMPL"/>
             </feature>
         </config-file>
-        <config-file target="AndroidManifest.xml" parent="/manifest">
+        <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.INTERNET"/>
             <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
         </config-file>
