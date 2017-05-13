@@ -38,6 +38,20 @@
         
      </platform>
      
+	<!-- browser -->
+	<platform name="browser">
+	  <config-file target="config.xml" parent="/*">
+	    <feature name="PayPalMPL">
+	      <param name="browser-package" value="PayPalMPL" />
+	    </feature>
+	  </config-file>
+
+	  <js-module src="src/browser/PayPalMPLProxy.js" name="PayPalMPLProxy">
+	    <runs />
+	  </js-module>
+	</platform>	
+	
+	
      <!-- ios -->
      <platform name="ios">
          <dependency id="com.paypal.mpl-ios" url="https://github.com/josemedaglia/com.paypal.mpl-ios"/>
