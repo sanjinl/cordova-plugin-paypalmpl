@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-paypalmpl",
+  "name": "com.rjfun.cordova.plugin.paypalmpl",
   "version": "1.0.0",
   "description": "A Cordova plugin for the PayPal MPL SDK.",
   "cordova": {
-    "id": "cordova-plugin-paypalmpl",
+    "id": "com.rjfun.cordova.plugin.paypalmpl",
     "platforms": [
       "android",
       "ios"
