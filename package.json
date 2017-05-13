@@ -1,0 +1,29 @@
+{
+  "name": "cordova-plugin-paypalmpl",
+  "version": "1.0.0",
+  "description": "A Cordova plugin for the PayPal MPL SDK.",
+  "cordova": {
+    "id": "cordova-plugin-paypalmpl",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sanjinl/cordova-plugin-paypalmpl"
+  },
+  "keywords": [
+    "cordova",
+    "paypalmpl",
+    "payment",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "com.paypal.mpl-android": "https://github.com/sanjinl/com.paypal.mpl-android",
+	"com.paypal.mpl-ios": "https://github.com/josemedaglia/com.paypal.mpl-ios"
+  }
+}
