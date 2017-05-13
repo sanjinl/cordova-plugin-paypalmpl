@@ -6,7 +6,8 @@
     "id": "com.rjfun.cordova.plugin.paypalmpl",
     "platforms": [
       "android",
-      "ios"
+      "ios",
+      "browser"
     ]
   },
   "repository": {
