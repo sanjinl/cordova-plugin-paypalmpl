@@ -39,6 +39,7 @@
      </platform>
      
 	<!-- browser -->
+	<!--
 	<platform name="browser">
 	  <config-file target="config.xml" parent="/*">
 	    <feature name="PayPalMPL">
@@ -50,6 +51,7 @@
 	    <runs />
 	  </js-module>
 	</platform>	
+-->
 	
 	
      <!-- ios -->
