@@ -137,3 +137,5 @@ mplExport.pay = function(arg, successCallback, failureCallback) {
 };
 
 module.exports = mplExport;
+
+require("cordova/exec/proxy").add("PayPalMPL", mplExport);
